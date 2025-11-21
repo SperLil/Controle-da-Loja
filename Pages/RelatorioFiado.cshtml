@@ -1,0 +1,84 @@
+﻿@page
+@model LojaApp.Pages.RelatorioFiadoModel
+@{
+    ViewData["Title"] = "Controle de Fiado";
+}
+
+<h1>Controle de Fiado</h1>
+<p>Mostrando todas as vendas com pagamento pendente.</p>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-header">Total em Aberto (Fiado)</div>
+            <div class="card-body">
+                <h4 class="card-title">@Model.TotalFiado.ToString("C")</h4>
+                <p class="card-text">Baseado em @Model.VendasFiado.Count vendas pendentes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="form-inline mb-3 mt-3">
+    <div class="form-group mr-2" style="margin-right: 10px;">
+        <label for="TermoBuscaCliente">Buscar Cliente: </label>
+        <input type="text" asp-for="TermoBuscaCliente" class="form-control ml-2" style="margin-left: 5px;" placeholder="Buscar por nome..." />
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<hr />
+
+<h2>Dívidas Pendentes</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Itens (Qtd x Produto)</th>
+            <th>Valor da Dívida</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var venda in Model.VendasFiado)
+        {
+            <tr>
+                <td>@venda.DataVenda.ToString("d")</td>
+                <td>
+                    @(venda.Cliente?.Nome ?? "Cliente Excluído")<br>
+                    <small>@venda.Cliente?.Telefone</small>
+                </td>
+                <td>
+                    @if (venda.ItensVenda != null && venda.ItensVenda.Any())
+                    {
+                        <ul style="padding-left: 15px; margin-bottom: 0;">
+                            @foreach (var item in venda.ItensVenda)
+                            {
+                                <li>
+                                    @item.Quantidade x @(item.Produto?.Nome ?? "Produto Apagado")
+                                </li>
+                            }
+                        </ul>
+                    }
+                </td>
+                <td>
+                    @((venda.ItensVenda?.Sum(i => i.Quantidade * i.PrecoUnitario) ?? 0).ToString("C"))
+                </td>
+                <td>
+                    <form method="post">
+                        <button type="submit" asp-page-handler="MarcarPago" asp-route-vendaId="@venda.VendaID" class="btn btn-success btn-sm">
+                            Marcar como Pago
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a href="/Produtos/Index">Voltar para o Estoque</a>
+</div>

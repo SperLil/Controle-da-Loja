@@ -1,0 +1,43 @@
+﻿@page
+@model LojaApp.Pages.Produtos.IndexModel
+@{
+    ViewData["Title"] = "Estoque de Produtos";
+}
+
+<h1>Produtos do Bazar (Estoque)</h1>
+
+<form method="get" class="form-inline mb-3">
+    <input type="text" asp-for="TermoBusca" class="form-control" placeholder="Buscar por nome..." />
+    <input type="submit" value="Buscar" class="btn btn-primary ml-2" style="margin-left: 5px;" />
+</form>
+
+<p>
+    <a href="/Produtos/Create">Cadastrar Novo Produto</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Produto)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                <td>@item.Preco.ToString("C")</td>
+                <td>@Html.DisplayFor(modelItem => item.Quantidade)</td>
+                <td>
+                    <a href="/Produtos/RegistrarVenda/@item.ProdutoID" class="btn btn-success btn-sm">Vender</a> |
+                    <a href="/Produtos/Edit/@item.ProdutoID">Editar</a> |
+                    <a href="/Produtos/Details/@item.ProdutoID">Detalhes</a> |
+                    <a href="/Produtos/Delete/@item.ProdutoID">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

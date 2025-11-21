@@ -1,0 +1,90 @@
+﻿@page
+@model LojaApp.Pages.RelatorioModel
+@{
+    ViewData["Title"] = "Relatório de Vendas";
+    var dataRelatorio = new DateTime(Model.Ano, Model.Mes, 1);
+}
+<h1>Relatório de Vendas</h1>
+
+<form method="get" class="form-inline mb-3">
+    <div class="form-group mr-2" style="margin-right: 10px;">
+        <label for="Mes">Mês: </label>
+        <select asp-for="Mes" class="form-control ml-2" style="margin-left: 5px;">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option value="@i">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
+            }
+        </select>
+    </div>
+    <div class="form-group mr-2" style="margin-right: 10px;">
+        <label for="Ano">Ano: </label>
+        <input type="number" asp-for="Ano" class="form-control ml-2" style="margin-left: 5px;" />
+    </div>
+
+    <div class="form-group mr-2" style="margin-right: 10px;">
+        <label for="TermoBuscaCliente">Cliente: </label>
+        <input type="text" asp-for="TermoBuscaCliente" class="form-control ml-2" style="margin-left: 5px;" placeholder="Buscar por nome..." />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<p>Mostrando todos os itens vendidos em @dataRelatorio.ToString("MMMM/yyyy").</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Total Vendido no Mês</div>
+            <div class="card-body">
+                <h4 class="card-title">@Model.TotalVendidoNoMes.ToString("C")</h4>
+
+                <p class="card-text">Baseado em @Model.ItensVendidosDoMes.Count itens vendidos.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+
+<h2>Detalhes dos Itens Vendidos</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Data/Hora</th>
+            <th>Cliente</th>
+            <th>Produto Vendido</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ItensVendidosDoMes)
+        {
+            <tr>
+                <td>@item.Venda.DataVenda.ToString("g")</td>
+                <td>@(item.Venda.Cliente?.Nome ?? "Anónimo")</td>
+                <td>@item.Quantidade x @(item.Produto?.Nome ?? "Produto Apagado")</td>
+                <td>
+                    @if (item.Venda.StatusPagamento == "Fiado")
+                    {
+                        <span class="badge bg-danger">Fiado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Pago</span>
+                    }
+                </td>
+                <td>@((item.Quantidade * item.PrecoUnitario).ToString("C"))</td>
+
+                <td>
+                    <a href="/Vendas/Delete/@item.Venda.VendaID" class="btn btn-sm btn-danger">Excluir Venda</a>
+                    <a href="/ItensVenda/Edit/@item.ItemVendaID" class="btn btn-sm btn-info">Corrigir Item</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a href="/Produtos/Index">Voltar para o Estoque</a>
+</div>

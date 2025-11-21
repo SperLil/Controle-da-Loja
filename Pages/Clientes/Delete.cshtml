@@ -1,0 +1,35 @@
+﻿@page "{id:int}"
+@model LojaApp.Pages.Clientes.DeleteModel
+@{
+    ViewData["Title"] = "Excluir Cliente";
+}
+
+<h1>Excluir Cliente</h1>
+
+<h3>Você tem certeza que quer excluir este cliente?</h3>
+<p class="text-danger">Atenção: Você não poderá excluir clientes que possuem vendas registradas (mesmo que pagas).</p>
+<div>
+    <h4>Cliente</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Cliente.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Cliente.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Cliente.Telefone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Cliente.Telefone)
+        </dd>
+    </dl>
+
+    <form method="post">
+        <input type="hidden" asp-for="Cliente.ClienteID" />
+        <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+        <input type="submit" value="Excluir" class="btn btn-danger" /> |
+        <a href="/Clientes/Index">Voltar para a Lista</a>
+    </form>
+</div>

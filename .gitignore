@@ -1,0 +1,7 @@
+# Ignorar pastas de build e temporárias
+bin/
+obj/
+.vs/
+
+# Ignorar arquivos de usuário
+*.user

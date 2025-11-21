@@ -1,0 +1,50 @@
+﻿@page
+@model LojaApp.Pages.ComoComprarModel
+@{
+    ViewData["Title"] = "Como Comprar";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Como Comprar</h1>
+    <p class="lead">Nosso processo é simples e direto pelo WhatsApp!</p>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8 offset-md-2">
+        <h2>Nosso Processo de Venda</h2>
+        <p>
+            Para mantermos um atendimento rápido e personalizado, todo o nosso catálogo e processo de venda é centralizado no WhatsApp.
+        </p>
+
+        <hr />
+
+        <h4>Passo 1: Veja as Novidades</h4>
+        <p>
+            Diariamente, postamos nossos produtos e novidades em destaque no Status do WhatsApp. Fique de olho!
+        </p>
+
+        <h4>Passo 2: Entre em Contato</h4>
+        <p>
+            Viu algo que gostou ou está procurando algo específico? Clique no botão abaixo para falar diretamente conosco!
+        </p>
+        <p>
+            Nosso número é o **(11) 95820-7746**.
+        </p>
+
+        <a href="https://wa.me/5511958207746"
+           target="_blank"
+           class="btn btn-success btn-lg mt-3">
+            <i class="fab fa-whatsapp"></i> Chamar no WhatsApp Agora
+        </a>
+        <p class="mt-2"><small>(Você será redirecionado para o WhatsApp Web ou seu aplicativo.)</small></p>
+
+        <h4 class="mt-5">Passo 3: Retire ou Receba</h4>
+        <p>
+            Após confirmar seu pedido pelo WhatsApp, você pode retirar seus produtos diretamente em nosso endereço (veja a página <a href="/Localizacao">Localização</a>) ou combinar a entrega (se disponível para sua região).
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

@@ -1,0 +1,49 @@
+﻿@page "{id:int}"
+@model LojaApp.Pages.ItensVenda.EditModel
+@{
+    ViewData["Title"] = "Editar Item da Venda";
+}
+
+<h1>Editar Item da Venda</h1>
+<p class="text-danger">Use esta página para corrigir a quantidade vendida ou o preço unitário do produto.</p>
+<hr />
+
+<h4 class="text-primary">Produto: @Model.ProdutoOriginal.Nome</h4>
+<p>Venda ID: @Model.VendaOriginal.VendaID | Cliente: @(Model.VendaOriginal.Cliente?.Nome ?? "Cliente Anônimo")</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="ItemVenda.ItemVendaID" />
+
+            <div class="form-group">
+                <label asp-for="ItemVenda.Quantidade" class="control-label"></label>
+                <input asp-for="ItemVenda.Quantidade" class="form-control" type="number" />
+                <span asp-validation-for="ItemVenda.Quantidade" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ItemVenda.PrecoUnitario" class="control-label"></label>
+                <input asp-for="ItemVenda.PrecoUnitario" class="form-control" />
+                <span asp-validation-for="ItemVenda.PrecoUnitario" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+                <input type="submit" value="Salvar Correção" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="/Relatorio">Voltar para o Relatório</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

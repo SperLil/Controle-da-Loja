@@ -1,0 +1,60 @@
+﻿@page "{id:int}"
+@model LojaApp.Pages.Vendas.DeleteModel
+@{
+    ViewData["Title"] = "Excluir Venda";
+}
+
+<h1>Excluir Venda</h1>
+
+<h3 class="text-danger">ATENÇÃO: Você tem certeza que deseja excluir esta venda?</h3>
+<p class="text-danger">Esta ação é irreversível e irá **REVERTER O ESTOQUE** dos produtos!</p>
+<hr />
+
+<div>
+    <h4>Detalhes da Venda</h4>
+    <dl class="row">
+        <dt class="col-sm-2">ID Venda:</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Venda.VendaID)</dd>
+
+        <dt class="col-sm-2">Data:</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Venda.DataVenda)</dd>
+
+        <dt class="col-sm-2">Cliente:</dt>
+        <dd class="col-sm-10">@(Model.Venda.Cliente?.Nome ?? "Anônimo") (@(Model.Venda.Cliente?.Telefone ?? "N/A"))</dd>
+
+        <dt class="col-sm-2">Valor Total:</dt>
+        <dd class="col-sm-10">@Model.ValorTotal.ToString("C")</dd>
+
+        <dt class="col-sm-2">Status:</dt>
+        <dd class="col-sm-10">@Model.Venda.StatusPagamento</dd>
+    </dl>
+</div>
+<hr />
+
+<h4>Itens Vendidos (Que serão repostos ao estoque):</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ItensVenda)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Produto.Nome)</td>
+                <td>@Html.DisplayFor(modelItem => item.Quantidade)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrecoUnitario)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<form method="post">
+    <input type="hidden" asp-for="Venda.VendaID" />
+    <input type="submit" value="Confirmar Exclusão e Reverter Estoque" class="btn btn-danger" /> |
+    <a href="/Relatorio">Voltar para o Relatório</a>
+</form>

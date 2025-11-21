@@ -1,0 +1,43 @@
+﻿@page
+@model LojaApp.Pages.LocalizacaoModel
+@{
+    ViewData["Title"] = "Nossa Localização";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Onde Estamos</h1>
+    <p class="lead">Venha nos fazer uma visita!</p>
+</div>
+
+<div class="row mt-5">
+
+    <div class="col-md-8">
+        <h2>Nosso Endereço no Mapa</h2>
+        <div class="map-responsive" style="overflow:hidden; padding-bottom:56.25%; position:relative; height:0;">
+            <iframe src="https://www.google.com/maps?q=Rua+Jo%C3%A3o+Veloso+de+Oliveira%2C+20%2C+Parque+S%C3%A3o+Domingos%2C+S%C3%A3o+Paulo&output=embed"
+                    width="100%"
+                    height="100%"
+                    frameborder="0"
+                    style="border:0; position:absolute; left:0; top:0;"
+                    allowfullscreen="">
+            </iframe>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <h2>Endereço</h2>
+        <p>
+            <strong>Rua João Veloso de Oliveira, 20</strong><br>
+            Parque São Domingos<br>
+            São Paulo - SP<br>
+            CEP: 05126-040
+        </p>
+
+        <h2>Horário de Funcionamento</h2>
+        <p>
+            <strong>Segunda a Sexta:</strong> 12:30 - 19:00<br>
+            <strong>Sábado:</strong> 13:00 - 16:00<br>
+            <strong>Domingo:</strong> Fechado
+        </p>
+    </div>
+</div>

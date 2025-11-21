@@ -1,0 +1,42 @@
+﻿@page "{id:int}"
+@model LojaApp.Pages.Produtos.DeleteModel
+@{
+    ViewData["Title"] = "Excluir Produto";
+}
+
+<h1>Excluir Produto</h1>
+
+<h3>Você tem certeza que quer excluir este produto?</h3>
+<p class="text-danger">Atenção: A exclusão só será permitida se o produto não tiver nenhum registro de venda associado.</p>
+<div>
+    <h4>Produto</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produto.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produto.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produto.Preco)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produto.Preco)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produto.Quantidade)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produto.Quantidade)
+        </dd>
+    </dl>
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <input type="hidden" asp-for="Produto.ProdutoID" />
+        <input type="submit" value="Excluir" class="btn btn-danger" /> |
+        <a href="/Produtos/Index">Voltar para a Lista</a>
+    </form>
+</div>

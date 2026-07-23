@@ -10,7 +10,7 @@ GO
 USE BazarDB;
 GO
 
---  Cria a tabela principal: Produtos
+--  tabela principal: Produtos
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Produtos' and xtype='U')
 BEGIN
     CREATE TABLE Produtos (
@@ -22,7 +22,7 @@ BEGIN
     );
 END
 GO
---  Cria a nossa nova tabela: Vendas
+--   Nova tabela: Vendas
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Vendas' and xtype='U')
 BEGIN
     CREATE TABLE Vendas (
@@ -130,3 +130,88 @@ BEGIN
     PRINT 'Tabela [ItensVenda] criada com sucesso.';
 END
 GO
+IF NOT EXISTS (
+    SELECT * FROM sys.columns 
+    WHERE object_id = OBJECT_ID(N'dbo.Vendas') AND name = 'ValorTotal'
+)
+BEGIN
+    ALTER TABLE Vendas
+    ADD ValorTotal DECIMAL(10, 2) NOT NULL DEFAULT 0;
+ 
+    PRINT 'Coluna [ValorTotal] adicionada à tabela Vendas.';
+END
+GO
+ IF NOT EXISTS (
+    SELECT * FROM sys.columns 
+    WHERE object_id = OBJECT_ID(N'dbo.Vendas') AND name = 'StatusPagamento'
+)
+BEGIN
+    ALTER TABLE Vendas
+    ADD StatusPagamento NVARCHAR(50) NOT NULL DEFAULT 'Pago';
+ 
+    PRINT 'Coluna [StatusPagamento] adicionada à tabela Vendas.';
+END
+GO
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Pagamentos' AND xtype='U')
+BEGIN
+    CREATE TABLE Pagamentos (
+        PagamentoID     INT PRIMARY KEY IDENTITY(1,1),
+ 
+        -- A qual venda este pagamento pertence
+        VendaID         INT NOT NULL,
+ 
+        -- Quando o dinheiro entrou
+        DataPagamento   DATETIME NOT NULL DEFAULT GETDATE(),
+         
+        -- Quanto foi pago nesta entrada
+        ValorPago       DECIMAL(10, 2) NOT NULL,
+ 
+        -- Opcional: forma de pagamento ('Dinheiro', 'PIX', 'Cartão', etc.)
+        FormaPagamento  NVARCHAR(50) NULL DEFAULT 'Dinheiro',
+ 
+        -- Observação livre (ex: "Primeira parcela", "Acerto final")
+        Observacao      NVARCHAR(255) NULL,
+ 
+        CONSTRAINT FK_Pagamentos_Vendas FOREIGN KEY (VendaID) REFERENCES Vendas(VendaID)
+    );
+ 
+    PRINT 'Tabela [Pagamentos] criada com sucesso.';
+END
+GO
+IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_SaldoVendas')
+    DROP VIEW vw_SaldoVendas;
+GO
+ 
+CREATE VIEW vw_SaldoVendas AS
+    SELECT
+        v.VendaID,
+        v.DataVenda,
+        v.ValorTotal,
+        v.StatusPagamento,
+        c.Nome                                          AS NomeCliente,
+        ISNULL(SUM(p.ValorPago), 0)                    AS TotalPago,
+        v.ValorTotal - ISNULL(SUM(p.ValorPago), 0)    AS ValorRestante
+    FROM Vendas v
+    LEFT JOIN Clientes c   ON c.ClienteID  = v.ClienteID
+    LEFT JOIN Pagamentos p ON p.VendaID    = v.VendaID
+    GROUP BY
+        v.VendaID, v.DataVenda, v.ValorTotal,
+        v.StatusPagamento, c.Nome;
+GO
+ 
+PRINT 'View [vw_SaldoVendas] criada com sucesso.';
+PRINT '';
+PRINT '=== Módulo de Pagamentos Parciais instalado! ===';
+GO
+USE BazarDB;
+
+-- Actualiza ValorTotal de cada Venda com a soma dos seus itens
+UPDATE Vendas
+SET ValorTotal = (
+    SELECT ISNULL(SUM(iv.Quantidade * iv.PrecoUnitario), 0)
+    FROM ItensVenda iv
+    WHERE iv.VendaID = Vendas.VendaID
+);
+
+-- Confirma o resultado
+SELECT VendaID, ValorTotal, StatusPagamento FROM Vendas;

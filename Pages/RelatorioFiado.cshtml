@@ -14,7 +14,9 @@
         <div class="card text-white bg-danger mb-3">
             <div class="card-header">Total em Aberto (Fiado)</div>
             <div class="card-body">
-                <h4 class="card-title">@Model.TotalFiado.ToString("C")</h4>
+                <h4 class="card-title">
+                    @Model.TotalEmAberto.ToString("C")
+                </h4>
                 <p class="card-text">Baseado em @Model.VendasFiado.Count vendas pendentes.</p>
             </div>
         </div>

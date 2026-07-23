@@ -1,0 +1,84 @@
+﻿@page "/Vendas/RegistarPagamento/{id:int}"
+@model LojaApp.Pages.Vendas.RegistarPagamentoModel
+@{
+    ViewData["Title"] = "Registar Pagamento";
+}
+
+<h1>Registar Pagamento</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-5">
+
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">Resumo da Venda #@Model.Venda.VendaID</div>
+            <div class="card-body">
+                <p><strong>Cliente:</strong> @(Model.Venda.Cliente?.Nome ?? "Anónimo")</p>
+                <p><strong>Data:</strong> @Model.Venda.DataVenda.ToString("g")</p>
+                <p><strong>Total da Venda:</strong> @Model.Venda.ValorTotal.ToString("C")</p>
+                <p><strong>Total Pago:</strong> @Model.Venda.TotalPago.ToString("C")</p>
+                <p>
+                    <strong>Restante:</strong>
+                    <span class="text-danger fw-bold">@Model.Venda.ValorRestante.ToString("C")</span>
+                </p>
+            </div>
+        </div>
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Valor a Pagar (máx. @Model.Venda.ValorRestante.ToString("C"))</label>
+                <input type="number" step="0.01" asp-for="ValorPago" class="form-control" placeholder="0,00" />
+                <span asp-validation-for="ValorPago" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Forma de Pagamento</label>
+                <select asp-for="FormaPagamento" class="form-control">
+                    <option>Dinheiro</option>
+                    <option>PIX</option>
+                    <option>Cartão</option>
+                    <option>Transferência</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Observação (opcional)</label>
+                <input type="text" asp-for="Observacao" class="form-control" placeholder="Ex: Primeira parcela, Acerto final..." />
+            </div>
+
+            <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+            <a href="/Relatorio" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+
+    </div>
+
+    @if (Model.Venda.Pagamentos.Any())
+    {
+        <div class="col-md-5 ms-4">
+            <h5>Histórico de Pagamentos</h5>
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Forma</th>
+                        <th>Valor</th>
+                        <th>Obs.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Venda.Pagamentos.OrderBy(p => p.DataPagamento))
+                    {
+                        <tr>
+                            <td>@p.DataPagamento.ToString("g")</td>
+                            <td>@p.FormaPagamento</td>
+                            <td>@p.ValorPago.ToString("C")</td>
+                            <td>@(p.Observacao ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

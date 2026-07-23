@@ -67,26 +67,29 @@ namespace LojaApp.Pages.Vendas
                 // Passo 2: Reverter o estoque de cada produto
                 foreach (var item in itensParaReverter)
                 {
-                    var produto = item.Produto;
-                    if (produto != null)
+                    if (item.Produto != null)
                     {
-                        // Adiciona a quantidade de volta ao estoque
-                        produto.Quantidade += item.Quantidade;
-                        _context.Attach(produto).State = EntityState.Modified;
+                        item.Produto.Quantidade += item.Quantidade;
+                        _context.Attach(item.Produto).State = EntityState.Modified;
                     }
                 }
 
-                // Passo 3: Remover todos os ItensVenda
+                // Passo 3: Remover os Pagamentos da venda
+                var pagamentos = await _context.Pagamentos
+                    .Where(p => p.VendaID == id)
+                    .ToListAsync();
+                _context.Pagamentos.RemoveRange(pagamentos);
+
+                // Passo 4: Remover os ItensVenda
                 _context.ItensVenda.RemoveRange(itensParaReverter);
 
-                // Passo 4: Remover a Venda principal
+                // Passo 5: Remover a Venda
                 _context.Vendas.Remove(venda);
 
-                // Passo 5: Salvar todas as mudanças
+                // Passo 6: Salvar tudo
                 await _context.SaveChangesAsync();
             }
 
-            // Redireciona de volta ao relatório de vendas
             return RedirectToPage("/Relatorio");
         }
     }

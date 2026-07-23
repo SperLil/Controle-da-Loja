@@ -24,5 +24,6 @@ namespace LojaApp.Models
 
         [ForeignKey("ProdutoID")]
         public virtual Produto? Produto { get; set; }
+
     }
 }

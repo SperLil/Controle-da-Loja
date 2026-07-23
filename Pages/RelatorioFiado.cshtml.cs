@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace LojaApp.Pages
 {
-    // ESTA É A CLASSE QUE ESTAVA FALTANDO
     public class RelatorioFiadoModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -18,46 +17,60 @@ namespace LojaApp.Pages
         {
             _context = context;
         }
+
         [BindProperty(SupportsGet = true)]
         public string TermoBuscaCliente { get; set; } = string.Empty;
+
         public IList<Venda> VendasFiado { get; set; } = new List<Venda>();
-        public decimal TotalFiado { get; set; }
+        public decimal TotalEmAberto { get; set; }
 
         public async Task OnGetAsync()
         {
-            // 1. Procura todas as vendas com Status "Fiado"
+            // Busca vendas "Fiado" OU "Parcial" — ambas têm saldo em aberto
             var query = _context.Vendas
                 .Include(v => v.Cliente)
                 .Include(v => v.ItensVenda).ThenInclude(item => item.Produto)
-                .Where(v => v.StatusPagamento == "Fiado");
+                .Include(v => v.Pagamentos) // <-- necessário para ValorRestante
+                .Where(v => v.StatusPagamento == "Fiado"
+                         || v.StatusPagamento == "Parcial");
 
-            // 2. APLICA O FILTRO DE NOME DO CLIENTE (SE EXISTIR)
             if (!string.IsNullOrEmpty(TermoBuscaCliente))
             {
-                // (v.Cliente != null) é uma verificação de segurança
-                query = query.Where(v => v.Cliente != null && v.Cliente.Nome.Contains(TermoBuscaCliente));
+                query = query.Where(v => v.Cliente != null
+                                      && v.Cliente.Nome.Contains(TermoBuscaCliente));
             }
 
-            // 3. Executa a consulta
             VendasFiado = await query
-                .OrderBy(v => v.Cliente.Nome) // Ordena por nome
-                .ThenBy(v => v.DataVenda)     // E depois por data
+                .OrderBy(v => v.Cliente != null ? v.Cliente.Nome : "")
+                .ThenBy(v => v.DataVenda)
                 .ToListAsync();
 
-            // 4. Calcula o total que os clientes devem
-            TotalFiado = 0;
-            foreach (var venda in VendasFiado)
-            {
-                TotalFiado += venda.ItensVenda?.Sum(item => item.PrecoUnitario * item.Quantidade) ?? 0;
-            }
+            // Total real em aberto (usando ValorRestante de cada venda)
+            TotalEmAberto = VendasFiado.Sum(v => v.ValorRestante);
         }
 
         public async Task<IActionResult> OnPostMarcarPagoAsync(int vendaId)
         {
-            var venda = await _context.Vendas.FindAsync(vendaId);
+            var venda = await _context.Vendas
+                .Include(v => v.Pagamentos)
+                .FirstOrDefaultAsync(v => v.VendaID == vendaId);
 
             if (venda != null)
             {
+                // Regista pagamento do restante
+                var restante = venda.ValorRestante;
+                if (restante > 0)
+                {
+                    _context.Pagamentos.Add(new Pagamento
+                    {
+                        VendaID = venda.VendaID,
+                        ValorPago = restante,
+                        FormaPagamento = "Dinheiro",
+                        Observacao = "Acerto total do fiado",
+                        DataPagamento = DateTime.Now
+                    });
+                }
+
                 venda.StatusPagamento = "Pago";
                 await _context.SaveChangesAsync();
             }

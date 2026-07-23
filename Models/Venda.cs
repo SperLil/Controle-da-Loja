@@ -14,14 +14,26 @@ namespace LojaApp.Models
 
         public int? ClienteID { get; set; }
 
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal ValorTotal { get; set; }
+
         [StringLength(50)]
         public string StatusPagamento { get; set; } = "Pago";
 
-        // --- Propriedades de Navegação ---
         [ForeignKey("ClienteID")]
         public virtual Cliente? Cliente { get; set; }
 
-        // UMA Venda agora tem VÁRIOS ItensVenda
         public virtual ICollection<ItemVenda>? ItensVenda { get; set; }
+
+        public virtual ICollection<Pagamento>? Pagamentos { get; set; }
+
+        [NotMapped]
+        public decimal TotalPago => Pagamentos?.Sum(p => p.ValorPago) ?? 0;
+
+        [NotMapped]
+        public decimal ValorRestante => ValorTotal - TotalPago;
+
+        [NotMapped]
+        public bool EmAberto => ValorRestante > 0;
     }
 }
